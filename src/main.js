@@ -4,10 +4,13 @@ import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
 
-Vue.config.productionTip = false;
+import VueTour from 'vue-tour'
 
-import { post, get } from "@/plugins/axios";
+require('vue-tour/dist/vue-tour.css')
 
-Vue.prototype.$post = post;
-Vue.prototype.$get = get;
+Vue.use(VueTour)
+
+
+Vue.config.productionTip = false; 
+ 
 new Vue({ vuetify, router, store, render: h => h(App) }).$mount("#app");

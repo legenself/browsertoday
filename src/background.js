@@ -1,13 +1,13 @@
  
-import { app, protocol, BrowserWindow,dialog } from "electron";
+import { app, protocol, BrowserWindow,dialog,Menu  } from "electron";
 // import db from '@/plugins/db'
 import sq3 from 'sqlite3';
-import path from 'path';
-import fs from 'fs'  
+import path from 'path'; 
 import ipc  from 'ipc2promise'
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";  
 const isDevelopment = process.env.NODE_ENV !== "production";
+// String
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -17,11 +17,12 @@ let win;
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
-
+Menu.setApplicationMenu(null)
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 800,
+    title:"今天我干了啥",
     height: 600,
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
@@ -42,7 +43,7 @@ function createWindow() {
   ipc.on('open-directory-dialog',async(e,data,resolve,reject)=>{
     dialog.showOpenDialog({
       title:"选择你的浏览记录文件",
-      properties:['openDirectory']
+      properties:['openFile']
     }).then(files=>{
  
         if(!files.canceled){
@@ -56,15 +57,16 @@ function createWindow() {
     // fs.copyFile(data,path.join( __dirname,'History'))
   })
 
-  ipc.on('sql',async(event,data,resolve,reject)=>{
-    console.log(data)
+  ipc.on('sql',async(event,data,resolve,reject)=>{ 
+
     const sqlite3 = sq3.verbose();
-    const db = new sqlite3.Database(path.join(data.folder,'History'));
+    const db = new sqlite3.Database(data.folder);
     db.all(data.sql,function(err,res){
       if(!err){
-        resolve(JSON.stringify(res));
+        resolve(res);
       }
       else{
+        // console.log(err)
         reject(err);
       }
     });

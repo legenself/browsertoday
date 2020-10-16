@@ -1,12 +1,18 @@
 <template>
   <v-container fluid>
+      <v-app-bar app dark flat color="blue-grey"  dense>
+        <v-btn id='step1' @click="selectfolder" text v-if="folder">已选择数据库文件 {{folder}}</v-btn>
+         <v-btn id='step1' @click="selectfolder" text v-else>选择文件夹</v-btn>
+         <v-spacer/>
+         <v-btn text @click="help">
+           <v-icon left small class="mr-1" >fa-question</v-icon>
+           帮助</v-btn>
+      </v-app-bar>
     <v-navigation-drawer width="320" dark app permanent>
-      <v-toolbar class="transparent" flat>
-              <v-btn @click="selectfolder">选择文件夹</v-btn>
-      </v-toolbar>
+    
       <v-row justify="center" class="pa-5">
-        <v-date-picker
-          color="teal"
+        <v-date-picker id='step2'
+          color="blue-grey"
           v-model="now"
           @change="changedate"
           no-title
@@ -25,12 +31,12 @@
       <v-sheet
         v-if="group.length != 0"
         class="ma-5 mx-auto"
-        color="teal"
+        color="blue-grey"
         rounded
         max-width="calc(100% - 64px)"
         elevation="2"
       >
-        <v-sparkline
+        <v-sparkline id='step3'
           color="rgba(255, 255, 255, .7)"
           gradients="#eee"
           smooth
@@ -48,9 +54,9 @@
           <v-expansion-panel v-for="(item, index) in group" :key="index">
             <v-expansion-panel-header
               class="  text-left"
-              :class="{ 'teal--text': sum(item) > 100 }"
+              :class="{ 'blue-grey--text': sum(item) > 100 }"
             >
-              {{ item[0].visit.visitAt | fromnow }} {{ item[0].url.title }}
+              {{ item[0].time | fromnow }} {{ item[0].title }}
             </v-expansion-panel-header>
             <v-expansion-panel-content>
               <v-list dense>
@@ -61,10 +67,10 @@
                 >
                   <v-list-item-content>
                     <v-list-item-title>
-                      <v-btn text :href="i.url.url" target="_blank"
-                        >{{ i.visit.visitAt | fromnow }}
+                      <v-btn text :href="i.url" target="_blank"
+                        >{{ i.time | fromnow }}
                         {{
-                          i.url.title.length == 0 ? "无标题" : i.url.title
+                          i.title.length == 0 ? "无标题" : i.title
                         }}</v-btn
                       >
                     </v-list-item-title>
@@ -76,6 +82,7 @@
         </v-expansion-panels>
       </v-col>
     </v-row>
+        <v-tour name="helper" :steps="steps" :options='options'></v-tour>
   </v-container>
 </template>
 
@@ -84,12 +91,35 @@
 // import db from '@/plugins/db.js'
 
 import moment from "moment";
+import "moment/locale/zh-cn"
 import { mapActions, mapState } from "vuex";
 export default {
   name: "Home",
 
   data() {
     return {
+      options:{
+        highlight: true,
+         labels: {
+                buttonSkip: '跳过',
+                buttonPrevious: '上一步',
+                buttonNext: '下一步',
+                buttonStop: '关闭'
+            }
+      },
+      steps:[
+        {
+          target:"#step1",
+          header:{
+            title:"点击选择google chrome的数据库文件"
+          },
+          content:"一般在 C:\\Users\\你的用户名\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\ 下的 History文件"
+        },
+        {
+          target:"#step2",
+          content:"选择日期，查看每一天干了什么"
+        }
+      ],
       pickerOptions: {
         shortcuts: [
           {
@@ -124,9 +154,8 @@ export default {
       now: ""
     };
   },
-  mounted() {
-    // moment.locale("zh-cn");
-  
+  mounted() { 
+
     // db.all("select * from test",function(err,res){
     //   if(!err){
     //     console.log(JSON.stringify(res));
@@ -135,7 +164,9 @@ export default {
     //     console.log(err);
     //   }
     // });
-    this.fetchhistory();
+
+
+    this.fetchhistory(this.now);
   },
   filters: {
     fromnow(x) {
@@ -146,20 +177,25 @@ export default {
     }
   },
   computed: {
-    ...mapState(["history", "group"]),
+    ...mapState(["history", "group",'folder']),
     historyhist() {
-      var label = this.group.map(p => moment(p[0].visit.visitAt).hour());
+      var label = this.group.map(p => moment(p[0].time).hour());
       var value = this.group.map(p => p.length);
 
       return { label, value };
     }
   },
   methods: {
-    ...mapActions(["fetchhistory",'setfolder']),
-    selectfolder(){
-      this.setfolder()
+    ...mapActions(["fetchhistory", "setfolder"]),
+    help(){
+      this.$tours['helper'].start()
+    },
+    selectfolder() {
+      this.setfolder();
     },
     changedate() {
+    //  new Notification({ body: 'Lorem Ipsum Dolor Sit Amet'}).show()
+      // console.log(this.now)
       // this.fetchhistory('select * from visits');
       this.fetchhistory(this.now);
     },
@@ -173,3 +209,4 @@ export default {
   }
 };
 </script>
+ 
