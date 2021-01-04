@@ -1,24 +1,20 @@
 # browsertoday.client
 
+
+用于浏览自己的chrome 历史记录，看看自己每天都浏览了些啥
 ## Project setup
 ```
-yarn install
+npm install
 ```
 
 ### Compiles and hot-reloads for development
 ```
-yarn serve
+npm run electron:serve
 ```
 
 ### Compiles and minifies for production
 ```
-yarn build
+npm run electron:build
 ```
 
-### Lints and fixes files
-```
-yarn lint
-```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

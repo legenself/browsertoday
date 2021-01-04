@@ -89,7 +89,7 @@
 <script>
 // @ is an alias to /src
 // import db from '@/plugins/db.js'
-
+import sq3 from 'sqlite3';
 import moment from "moment";
 import "moment/locale/zh-cn"
 import { mapActions, mapState } from "vuex";
@@ -164,8 +164,7 @@ export default {
     //     console.log(err);
     //   }
     // });
-
-
+     console.log(new (sq3.verbose().Database)("C://a.db"))
     this.fetchhistory(this.now);
   },
   filters: {
